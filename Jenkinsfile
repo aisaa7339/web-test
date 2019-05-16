@@ -5,6 +5,12 @@ node('linux'){
         sh 'aws cloudformation create-stack --region us-east-1 --stack-name final-test --template-body file://docker-single-server.json --parameters ParameterKey=KeyName,ParameterValue=Practice.pem,ParameterKey=Yourip,ParameterValue=$(curl ifconfig.me)/32'
         sh 'aws cloudformation wait stack-create-complete --stack-name final-test --region us-east-1'
         sh 'aws cloudformation describe-stacks --stack-name final-test --region us-east-1'
+        sh 'aws cloudformation describe-stacks --stack-name final-test --region us-east-1'
+        env.docker1IP = sh returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name final-test --region us-east-1 --query Stacks[].Outputs[].[OutputValue] --output text'
+        sshagent(['12e2b946-a0d6-4551-8f8c-a2ec16b2db9c']) {
+			sh 'ssh -o StrictHostKeyChecking=no ubuntu@${docker1IP} uptime'
+		}
+        
     }
 
 }
