@@ -1,0 +1,205 @@
+Started by user admin
+Running in Durability level: MAX_SURVIVABILITY
+[Pipeline] node
+Running on 88c47b4b4876 in /workspace/exam-jenkins
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Test Stack)
+[Pipeline] git
+Fetching changes from the remote Git repository
+Checking out Revision 2a157b74a219a40c037e8d83014a3520549785af (refs/remotes/origin/master)
+Commit message: "Update docker-single-server.json"
+[Pipeline] withCredentials
+[Pipeline] {
+[Pipeline] sh
++ curl ifconfig.me
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100    11  100    11    0     0    139      0 --:--:-- --:--:-- --:--:--   139
++ aws cloudformation create-stack --region us-east-1 --stack-name final-test --template-body file://docker-single-server.json --parameters ParameterKey=KeyName,ParameterValue=Exam ParameterKey=YourIp,ParameterValue=54.159.94.9/32
+ > git rev-parse --is-inside-work-tree # timeout=10
+ > git config remote.origin.url https://github.com/aisaa7339/web-test.git # timeout=10
+Fetching upstream changes from https://github.com/aisaa7339/web-test.git
+ > git --version # timeout=10
+using GIT_ASKPASS to set credentials GITHUB
+ > git fetch --tags --progress https://github.com/aisaa7339/web-test.git +refs/heads/*:refs/remotes/origin/*
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+ > git rev-parse refs/remotes/origin/origin/master^{commit} # timeout=10
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 2a157b74a219a40c037e8d83014a3520549785af
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D master # timeout=10
+ > git checkout -b master 2a157b74a219a40c037e8d83014a3520549785af
+ > git rev-list --no-walk 2a157b74a219a40c037e8d83014a3520549785af # timeout=10
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:979063470202:stack/final-test/4eac77c0-779c-11e9-914d-0ed7a3d4fec0"
+}
+[Pipeline] sh
++ aws cloudformation wait stack-create-complete --stack-name final-test --region us-east-1
+[Pipeline] sh
++ aws cloudformation describe-stacks --stack-name final-test --region us-east-1
+{
+    "Stacks": [
+        {
+            "StackId": "arn:aws:cloudformation:us-east-1:979063470202:stack/final-test/4eac77c0-779c-11e9-914d-0ed7a3d4fec0", 
+            "DriftInformation": {
+                "StackDriftStatus": "NOT_CHECKED"
+            }, 
+            "Parameters": [
+                {
+                    "ParameterValue": "Exam", 
+                    "ParameterKey": "KeyName"
+                }, 
+                {
+                    "ParameterValue": "54.159.94.9/32", 
+                    "ParameterKey": "YourIp"
+                }
+            ], 
+            "Tags": [], 
+            "Outputs": [
+                {
+                    "Description": "docker1 public IP", 
+                    "OutputKey": "manager1PublicIp", 
+                    "OutputValue": "35.172.111.26"
+                }
+            ], 
+            "EnableTerminationProtection": false, 
+            "CreationTime": "2019-05-16T05:34:43.061Z", 
+            "StackName": "final-test", 
+            "NotificationARNs": [], 
+            "StackStatus": "CREATE_COMPLETE", 
+            "DisableRollback": false, 
+            "RollbackConfiguration": {}
+        }
+    ]
+}
+[Pipeline] sh
++ aws cloudformation describe-stacks --stack-name final-test --region us-east-1 --query Stacks[].Outputs[].[OutputValue] --output text
+[Pipeline] sshagent
+[ssh-agent] Using credentials aisaa7339 (Exam_Practice)
+[ssh-agent] Looking for ssh-agent implementation...
+[ssh-agent]   Exec ssh-agent (binary ssh-agent on a remote machine)
+SSH_AUTH_SOCK=/tmp/ssh-EKBYS4fDkzeX/agent.2305
+SSH_AGENT_PID=2307
+Running ssh-add (command line suppressed)
+[ssh-agent] Started.
+[Pipeline] {
+[Pipeline] sh
++ ssh -o StrictHostKeyChecking=no ubuntu@35.172.111.26 uptime
+Warning: Permanently added '35.172.111.26' (ECDSA) to the list of known hosts.
+$ ssh-agent
+Identity added: /workspace/exam-jenkins@tmp/private_key_8736768076670781980.key (/workspace/exam-jenkins@tmp/private_key_8736768076670781980.key)
+ 05:36:22 up 0 min,  0 users,  load average: 0.14, 0.03, 0.01
+[Pipeline] }
+[ssh-agent] Stopped.
+[Pipeline] // sshagent
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy Redis Stanalone)
+[Pipeline] sshagent
+[ssh-agent] Using credentials aisaa7339 (Exam_Practice)
+[ssh-agent] Looking for ssh-agent implementation...
+[ssh-agent]   Exec ssh-agent (binary ssh-agent on a remote machine)
+SSH_AUTH_SOCK=/tmp/ssh-Vlq2hS0eFQAj/agent.2322
+SSH_AGENT_PID=2324
+Running ssh-add (command line suppressed)
+[ssh-agent] Started.
+[Pipeline] {
+[Pipeline] sh
++ ssh ubuntu@35.172.111.26 docker run -d --name redis -p 6379:6379 redis:latest
+$ ssh-agent -k
+unset SSH_AUTH_SOCK;
+unset SSH_AGENT_PID;
+echo Agent pid 2307 killed;
+$ ssh-agent
+Identity added: /workspace/exam-jenkins@tmp/private_key_9102872487764616603.key (/workspace/exam-jenkins@tmp/private_key_9102872487764616603.key)
+Unable to find image 'redis:latest' locally
+latest: Pulling from library/redis
+743f2d6c1f65: Pulling fs layer
+171658c5966d: Pulling fs layer
+fbef10bd7a65: Pulling fs layer
+0b0b11956c72: Pulling fs layer
+09dbd716637e: Pulling fs layer
+d09046fd4481: Pulling fs layer
+0b0b11956c72: Waiting
+09dbd716637e: Waiting
+d09046fd4481: Waiting
+171658c5966d: Verifying Checksum
+171658c5966d: Download complete
+fbef10bd7a65: Verifying Checksum
+fbef10bd7a65: Download complete
+09dbd716637e: Verifying Checksum
+09dbd716637e: Download complete
+743f2d6c1f65: Verifying Checksum
+743f2d6c1f65: Download complete
+d09046fd4481: Verifying Checksum
+d09046fd4481: Download complete
+0b0b11956c72: Verifying Checksum
+0b0b11956c72: Download complete
+743f2d6c1f65: Pull complete
+171658c5966d: Pull complete
+fbef10bd7a65: Pull complete
+0b0b11956c72: Pull complete
+09dbd716637e: Pull complete
+d09046fd4481: Pull complete
+Digest: sha256:e549a30b3c31e6305b973e0d9113a3d38d60566708137af9ed7cbdce5650c5cc
+Status: Downloaded newer image for redis:latest
+1926a3f3a6a71d861da4a2052ef2928b51a09cd8dab32479e80826c6f4777215
+[Pipeline] }
+[ssh-agent] Stopped.
+[Pipeline] // sshagent
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Test Redis Standalone)
+[Pipeline] sshagent
+[ssh-agent] Using credentials aisaa7339 (Exam_Practice)
+[ssh-agent] Looking for ssh-agent implementation...
+[ssh-agent]   Exec ssh-agent (binary ssh-agent on a remote machine)
+SSH_AUTH_SOCK=/tmp/ssh-q2KEJKrKFpGE/agent.2346
+SSH_AGENT_PID=2348
+Running ssh-add (command line suppressed)
+[ssh-agent] Started.
+[Pipeline] {
+[Pipeline] sh
++ ssh ubuntu@35.172.111.26 redis-cli set hello world
+OK
+[Pipeline] sh
+$ ssh-agent -k
+unset SSH_AUTH_SOCK;
+unset SSH_AGENT_PID;
+echo Agent pid 2324 killed;
+$ ssh-agent
+Identity added: /workspace/exam-jenkins@tmp/private_key_2821722327072977536.key (/workspace/exam-jenkins@tmp/private_key_2821722327072977536.key)
++ ssh ubuntu@35.172.111.26 redis-cli get hello
+world
+[Pipeline] }
+[ssh-agent] Stopped.
+[Pipeline] // sshagent
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Delete Test Stack)
+[Pipeline] withCredentials
+[Pipeline] {
+[Pipeline] sh
++ aws cloudformation delete-stack --stack-name final-test --region us-east-1
+[Pipeline] sh
+$ ssh-agent -k
+unset SSH_AUTH_SOCK;
+unset SSH_AGENT_PID;
+echo Agent pid 2348 killed;
++ aws cloudformation wait stack-delete-complete --stack-name final-test --region us-east-1
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
